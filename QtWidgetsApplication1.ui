@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1400</width>
-    <height>888</height>
+    <height>1000</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QPushButton" name="clearCrosswordButton">
     <property name="geometry">
      <rect>
-      <x>970</x>
-      <y>30</y>
-      <width>80</width>
-      <height>21</height>
+      <x>1180</x>
+      <y>230</y>
+      <width>170</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="text">
@@ -30,11 +30,17 @@
    <widget class="QPushButton" name="createNewCrosswordButton">
     <property name="geometry">
      <rect>
-      <x>940</x>
-      <y>70</y>
-      <width>131</width>
-      <height>21</height>
+      <x>620</x>
+      <y>390</y>
+      <width>170</width>
+      <height>50</height>
      </rect>
+    </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::PreventContextMenu</enum>
+    </property>
+    <property name="toolTipDuration">
+     <number>-1</number>
     </property>
     <property name="text">
      <string>create new crossword</string>
@@ -43,10 +49,10 @@
    <widget class="QPushButton" name="finishCreationButton">
     <property name="geometry">
      <rect>
-      <x>950</x>
-      <y>150</y>
-      <width>111</width>
-      <height>21</height>
+      <x>1180</x>
+      <y>500</y>
+      <width>170</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="text">
@@ -54,32 +60,74 @@
     </property>
    </widget>
    <widget class="QTableWidget" name="crosswordTable">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>300</x>
       <y>0</y>
       <width>800</width>
       <height>800</height>
      </rect>
     </property>
+    <property name="toolTipDuration">
+     <number>0</number>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+    </property>
+    <property name="dragEnabled">
+     <bool>false</bool>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="textElideMode">
+     <enum>Qt::ElideRight</enum>
+    </property>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>20</number>
+    </attribute>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>20</number>
+    </attribute>
+    <attribute name="verticalHeaderMinimumSectionSize">
+     <number>20</number>
+    </attribute>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>20</number>
+    </attribute>
    </widget>
    <widget class="QPlainTextEdit" name="exps">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>290</y>
-      <width>471</width>
-      <height>501</height>
+      <x>0</x>
+      <y>810</y>
+      <width>1401</width>
+      <height>191</height>
      </rect>
+    </property>
+    <property name="plainText">
+     <string>Выражения:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="editCrossword">
     <property name="geometry">
      <rect>
-      <x>940</x>
-      <y>110</y>
-      <width>141</width>
-      <height>21</height>
+      <x>1180</x>
+      <y>410</y>
+      <width>170</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="text">
@@ -89,14 +137,27 @@
    <widget class="QPushButton" name="checkButton">
     <property name="geometry">
      <rect>
-      <x>960</x>
-      <y>180</y>
-      <width>131</width>
-      <height>101</height>
+      <x>1180</x>
+      <y>500</y>
+      <width>170</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="text">
      <string>check</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="startButton">
+    <property name="geometry">
+     <rect>
+      <x>640</x>
+      <y>240</y>
+      <width>131</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>start</string>
     </property>
    </widget>
   </widget>

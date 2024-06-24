@@ -16,6 +16,7 @@ void QtWidgetsApplication1::updateTable() {
     ui->crosswordTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
     ui->crosswordTable->horizontalHeader()->hide();
     ui->crosswordTable->verticalHeader()->hide();
+    ui->crosswordTable->show();
 }
 
 QtWidgetsApplication1::QtWidgetsApplication1(QWidget* parent)
@@ -23,11 +24,14 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget* parent)
     , ui(new Ui::QtWidgetsApplication1)
 {
     ui->setupUi(this);
+
     ui->crosswordTable->setItemDelegate(new SingleLetterDelegate(ui->crosswordTable));
     ui->crosswordTable->setColumnCount(40);
     ui->crosswordTable->setRowCount(40);
-    updateTable();
-    //ui->crosswordTable->show();
+    ui->crosswordTable->hide();
+    ui->checkButton->hide();
+    ui->clearCrosswordButton->hide();
+    ui->editCrossword->hide();
 
     // Скрываем элементы для добавления выражений
     ui->finishCreationButton->hide();
@@ -42,11 +46,25 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget* parent)
     connect(ui->clearCrosswordButton, &QPushButton::clicked, this, &QtWidgetsApplication1::onClearCrossword);
     connect(ui->editCrossword, &QPushButton::clicked, this, &QtWidgetsApplication1::onEditCrossword);
     connect(ui->checkButton, &QPushButton::clicked, this, &QtWidgetsApplication1::onCheckButton);
+    connect(ui->startButton, &QPushButton::clicked, this, &QtWidgetsApplication1::onStartButton);
 }
 
 QtWidgetsApplication1::~QtWidgetsApplication1()
 {
     delete ui;
+}
+
+void QtWidgetsApplication1::onStartButton()
+{
+    ui->startButton->hide();
+    ui->startButton->setDisabled(true);
+    updateTable();
+    ui->crosswordTable->setEnabled(true);
+    ui->checkButton->show();
+    ui->clearCrosswordButton->show();
+    ui->editCrossword->show();
+    ui->exps->show();
+    ui->createNewCrosswordButton->setGeometry(1180, 320, 170, 50);
 }
 
 void QtWidgetsApplication1::onCheckButton()
@@ -103,9 +121,6 @@ void QtWidgetsApplication1::onCheckButton()
                     }
                 }
             }
-            /*if (ui->crosswordTable->item(j, i)->flags() != 0 && ui->crosswordTable->item(j, i)->text() == correctAnswers[qMakePair(j, i)]) {
-                ui->crosswordTable->item(j, i)->setBackground(Qt::green);
-            }*/
         }
     }
 }
@@ -136,7 +151,12 @@ void QtWidgetsApplication1::onCreateNewCrossword()
     ui->exps->show();
     ui->exps->setEnabled(true);
     ui->crosswordTable->setShowGrid(true);
+    ui->clearCrosswordButton->show();
+    ui->startButton->hide();
+    ui->startButton->setDisabled(true);
     updateTable();
+    ui->crosswordTable->setEnabled(true);
+    correctAnswers.clear();
 }
 
 void QtWidgetsApplication1::onCellClicked(int row, int column)
@@ -154,7 +174,6 @@ void QtWidgetsApplication1::onFinishCreation()
         for (int j = 0; j < 40; ++j) {
             if (ui->crosswordTable->item(j, i)->text() == "") 
             {
-                //ui->crosswordTable->item(j, i)->setBackground(Qt::black);
                 ui->crosswordTable->item(j, i)->setBackground(Qt::transparent);
                 ui->crosswordTable->item(j, i)->setFlags(Qt::NoItemFlags);
             }
@@ -175,6 +194,10 @@ void QtWidgetsApplication1::onFinishCreation()
     ui->checkButton->show();
     ui->finishCreationButton->hide();
     ui->exps->setEnabled(false);
+    ui->checkButton->show();
+    ui->clearCrosswordButton->show();
+    ui->editCrossword->show();
+    ui->createNewCrosswordButton->setGeometry(1180, 320, 170, 50);
 }
 
 void QtWidgetsApplication1::onClearCrossword()

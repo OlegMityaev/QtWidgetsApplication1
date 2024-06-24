@@ -27,6 +27,7 @@ private slots:
     void onClearCrossword();
     void onCheckButton();
     void updateTable();
+    void onStartButton();
 
 private:
     Ui::QtWidgetsApplication1* ui;
