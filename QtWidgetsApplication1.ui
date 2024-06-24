@@ -1,123 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>QtWidgetsApplication1</class>
+ <widget class="QMainWindow" name="QtWidgetsApplication1">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1276</width>
-    <height>818</height>
+    <width>1400</width>
+    <height>888</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Crossword Game</string>
+   <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="title">
-         <string>GroupBox</string>
-        </property>
-        <widget class="QTableWidget" name="crosswordTable">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>1111</width>
-           <height>611</height>
-          </rect>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="clearButton">
-         <property name="geometry">
-          <rect>
-           <x>1120</x>
-           <y>170</y>
-           <width>121</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>clear crossword</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="createButton">
-         <property name="geometry">
-          <rect>
-           <x>1120</x>
-           <y>230</y>
-           <width>121</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>create new crossword </string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="confirmButton">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>1120</x>
-           <y>290</y>
-           <width>121</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="text">
-          <string>confirm!</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="addExpButton">
-         <property name="geometry">
-          <rect>
-           <x>1130</x>
-           <y>670</y>
-           <width>111</width>
-           <height>51</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>add new expression</string>
-         </property>
-        </widget>
-        <widget class="QWidget" name="verticalLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>-1</x>
-           <y>609</y>
-           <width>1111</width>
-           <height>191</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="expressions"/>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </item>
-   </layout>
+   <widget class="QPushButton" name="clearCrosswordButton">
+    <property name="geometry">
+     <rect>
+      <x>970</x>
+      <y>30</y>
+      <width>80</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>clear</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="createNewCrosswordButton">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>70</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>create new crossword</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="finishCreationButton">
+    <property name="geometry">
+     <rect>
+      <x>950</x>
+      <y>150</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>finish creation</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="crosswordTable">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>800</width>
+      <height>800</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="exps">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>290</y>
+      <width>471</width>
+      <height>501</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="editCrossword">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>110</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>edit this crossword</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="checkButton">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>180</y>
+      <width>131</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>check</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

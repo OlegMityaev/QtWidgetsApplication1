@@ -1,32 +1,35 @@
 #pragma once
-#define MAINWINDOW_H
-#include <QLabel> 
+#include "SingleLetterDelegate.h"
 #include <QMainWindow>
-#include <QTableWidget>
-#include <QLineEdit>
 #include <QPushButton>
-#include <QRegularExpression>
-#include <QRegularExpressionMatch>
+#include <QTableWidget>
+#include <qplaintextedit.h>
+#include <QBrush>
+#include <QPixmap>
 
-namespace Ui { class MainWindow; }
 
-class MainWindow : public QMainWindow
+
+namespace Ui { class QtWidgetsApplication1; }
+
+class QtWidgetsApplication1 : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget* parent = nullptr);
-    ~MainWindow();
+    QtWidgetsApplication1(QWidget* parent = nullptr);
+    ~QtWidgetsApplication1();
 
 private slots:
-    void on_createButton_clicked();
-    void on_clearButton_clicked();
-    void on_confirmButton_clicked();
+    void onCreateNewCrossword();
+    void onEditCrossword();
+    void onCellClicked(int row, int column);
+    void onFinishCreation();
+    void onClearCrossword();
+    void onCheckButton();
+    void updateTable();
+
 private:
-    Ui::MainWindow* ui;
-    void loadCrosswordConfig();
-    void loadCrosswordConfigToCreate();
-    void checkCrossword();
-    bool checkWord(const QString& word, const QRegularExpression& regex);
+    Ui::QtWidgetsApplication1* ui;
+    QMap<QPair<int, int>, QString> correctAnswers; // To store the correct answers
 };
 

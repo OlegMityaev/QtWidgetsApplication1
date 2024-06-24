@@ -1,10 +1,12 @@
+#include <QApplication>
 #include "QtWidgetsApplication1.h"
-#include <QtWidgets/QApplication>
 
-int main(int argc, char *argv[])
+
+int main(int argc, char* argv[])
 {
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     QApplication a(argc, argv);
-    MainWindow w;
+    QtWidgetsApplication1 w;
     w.show();
     return a.exec();
 }
