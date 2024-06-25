@@ -15,8 +15,8 @@ public:
         QLineEdit* editor = new QLineEdit(parent);
         editor->setMaxLength(2);  // Ограничиваем длину вводимого текста одной буквой
 
-        // Устанавливаем валидатор, чтобы разрешить только буквы
-        QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]|\\d{1,2}"));
+        // Устанавливаем валидатор, чтобы разрешить только буквы или цифры
+        QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]|\\d{0,2}"));
         QValidator* validator = new QRegularExpressionValidator(regex, editor);
         editor->setValidator(validator);
 
@@ -34,7 +34,11 @@ public:
         QString value = lineEdit->text();
 
         // Проверяем, что введено ровно одно буквенное или числовое значение
-        if ((value.length() == 1 && value.at(0).isLetter()) || (value.length() >= 1 && value.length() <= 2 && value.toInt() >= 0 && value.toInt() <= 99)) {
+        if (value.isEmpty()) {
+            QTableWidget* table = static_cast<QTableWidget*>(model->parent());
+            table->item(index.row(), index.column())->setText("");  // Устанавливаем пустое значение напрямую
+        }
+        else if ((value.length() == 1 && value.at(0).isLetter()) || (value.length() >= 0 && value.length() <= 2 && value.toInt() >= 0 && value.toInt() <= 99)) {
             model->setData(index, value, Qt::EditRole);
         }
     }
