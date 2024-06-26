@@ -1,7 +1,0 @@
-Correct answers:
-23 21 1
-23 22 а
-23 23 а
-23 24 а
-Expressions:
-Выражения: 1) ааа

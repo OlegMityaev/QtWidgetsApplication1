@@ -7,16 +7,16 @@
 #include <QRegularExpressionValidator>
 
 // Класс делегата для ограничения ввода
-class SingleLetterDelegate : public QStyledItemDelegate {
+class LetterOrNumberDelegate : public QStyledItemDelegate {
 public:
-    SingleLetterDelegate(QObject* parent = nullptr) : QStyledItemDelegate(parent) {}
+    LetterOrNumberDelegate(const QRegularExpression& regex, QObject* parent = nullptr)
+        : QStyledItemDelegate(parent), regex(regex) {}
 
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override {
         QLineEdit* editor = new QLineEdit(parent);
-        editor->setMaxLength(2);  // Ограничиваем длину вводимого текста одной буквой
+        editor->setMaxLength(2);  // Ограничиваем длину вводимого текста
 
-        // Устанавливаем валидатор, чтобы разрешить только буквы или цифры
-        QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]|\\d{0,2}"));
+        // Устанавливаем валидатор, используя переданное регулярное выражение
         QValidator* validator = new QRegularExpressionValidator(regex, editor);
         editor->setValidator(validator);
 
@@ -46,4 +46,8 @@ public:
     void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override {
         editor->setGeometry(option.rect);
     }
+
+private:
+    QRegularExpression regex;
 };
+

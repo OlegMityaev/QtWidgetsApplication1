@@ -1,5 +1,5 @@
 #pragma once
-#include "SingleLetterDelegate.h"
+#include "LetterOrNumberDelegate.h"
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTableWidget>
@@ -16,9 +16,11 @@
 #include <QDir>
 #include <QFileDialog>
 #include <qtextstream.h>
+//#include <vector>
+#include <set>
 
-const QString SAVES_DIR = QDir::currentPath() + "/saves";
-
+const QString CLASSIC_SAVES_DIR = QDir::currentPath() + "/classic_saves";
+const QString REGEX_SAVES_DIR = QDir::currentPath() + "/regex_saves";
 
 namespace Ui { class QtWidgetsApplication1; }
 
@@ -42,16 +44,26 @@ private slots:
     void showWinMessage();
     void onSaveButton();
     void saveToFile();
-    void onRestartButton();
+    void onMenuButton();
     void loadCrossword();
+    void onClassicMode(int state);
+    void onRegexMode(int state);
 
 private:
-    QString imagePath = "tableItem.png";
+    bool mode = 0; // 0 - классический режим, 1 - regex режим
+    bool isValidText(QString& text, QRegularExpression regex); // подходит ли введенное слово под регул€рное выражение 
+    bool contains(std::vector<QPair<int, int>> v, QPair<int, int> p); // дл€ того, чтобы определить, есть ли така€ €чейка в векторе (используетс€ дл€ cellsSelectedVector)
+    void cellsSelected(); // записывает выделенные €чейки в cellsSelectedVector;
+    void setRegexAnswers(); // записывает regexAnswer
+    LetterOrNumberDelegate* delegate; // дл€ ограничени€ ввода
+    QString imagePath = "tableItem.png"; // фон пустой €чейки
     QPixmap* pixmap;
     QBrush* brush;
     QLineEdit* name_of_save;
     QLabel* textLabel;
     Ui::QtWidgetsApplication1* ui;
-    QMap<QPair<int, int>, QString> correctAnswers; // To store the correct answers
+    std::vector<QPair<int, int>> cellsSelectedVector; // вектор выделенных €чеек дл€ regex mode
+    QMap<QPair<int, int>, QRegularExpression> regexAnswer; // key - €чейка (с номером выражени€), value - выражение (записываетс€ упор€доченно) (дл€ regex)
+    QMap<QPair<int, int>, QString> correctAnswers; // key - €чейка, value - правильный ответ (дл€ классик)
 };
 
