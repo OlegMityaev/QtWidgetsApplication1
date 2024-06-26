@@ -1,12 +1,6 @@
 #include "QtWidgetsApplication1.h"
 #include "ui_QtWidgetsApplication1.h"
 
-// перегрузка оператора сравнения
-//bool operator==(QPair<int, int> p1, QPair<int, int> p2)
-//{
-//    return (p1.first == p2.first && p1.second == p2.second);
-//}
-
 void QtWidgetsApplication1::updateTable() {
     ui->crosswordTable->setEnabled(true);
     ui->crosswordTable->clear();
@@ -38,7 +32,6 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget* parent)
     ui->graphicsView->hide();
     
     QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$|^\\d{1,2}$"));
-    //QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]+|\\d{0,2}"));
     delegate = new LetterOrNumberDelegate(regex, this);
     mode = 0;
     ui->crosswordTable->setItemDelegate(delegate);
@@ -132,6 +125,7 @@ void QtWidgetsApplication1::onRegexMode(int state)
 // кнопка старт
 void QtWidgetsApplication1::onStartButton()
 {
+    is_start = true;
     ui->menuButton->show();
     ui->classicModeBox->hide();
     ui->regexModeBox->hide();
@@ -170,7 +164,7 @@ void QtWidgetsApplication1::onSaveButton()
     name_of_save->setEnabled(true);
     name_of_save->setReadOnly(false);
     // Установить валидатор для QLineEdit
-    QRegExp rx("[a-zA-Z0-9]*"); // Разрешены только английские буквы и цифры
+    QRegExp rx("[a-zA-Z0-9]+"); // Разрешены только английские буквы и цифры
     QRegExpValidator* validator = new QRegExpValidator(rx, this);
     name_of_save->setValidator(validator);
     name_of_save->show();
@@ -260,15 +254,23 @@ void QtWidgetsApplication1::saveToFile()
 
 void QtWidgetsApplication1::loadCrossword()
 {
+
     connect(ui->crosswordTable, &QTableWidget::itemClicked, this, &QtWidgetsApplication1::onCheck);
     QString fileName = "";
-    if (mode == 0) {
-        fileName = QFileDialog::getOpenFileName(this, QStringLiteral("Загрузите кроссворд"), CLASSIC_SAVES_DIR, QStringLiteral("Файлы: (*.txt)"));
+    if (is_start)
+    {
+        if (mode == 0) fileName = QDir::currentPath() + "/start/classic_start.txt";
+        else fileName = QDir::currentPath() + "/start/regex_start.txt";
     }
-    else {
-        fileName = QFileDialog::getOpenFileName(this, QStringLiteral("Загрузите кроссворд"), REGEX_SAVES_DIR, QStringLiteral("Файлы: (*.txt)"));
+    else
+    {
+        if (mode == 0) {
+            fileName = QFileDialog::getOpenFileName(this, QStringLiteral("Загрузите кроссворд"), CLASSIC_SAVES_DIR, QStringLiteral("Файлы: (*.txt)"));
+        }
+        else {
+            fileName = QFileDialog::getOpenFileName(this, QStringLiteral("Загрузите кроссворд"), REGEX_SAVES_DIR, QStringLiteral("Файлы: (*.txt)"));
+        }
     }
-
     if (fileName.isEmpty())
         return;
 
@@ -278,13 +280,13 @@ void QtWidgetsApplication1::loadCrossword()
         QMessageBox::warning(this, QStringLiteral("Ошибка"), QStringLiteral("Ошибка при загрузке кроссворда"));
         return;
     }
+    
 
     QString content = file.readAll();
     file.close();
 
     QStringList words = content.split(QRegExp("\\s+"), QString::SkipEmptyParts);
-    QPixmap pixmap(imagePath);
-    QBrush brush(pixmap);
+    brush = new QBrush(*pixmap);
     QString exps_t;
     int k = 0;
     updateTable();
@@ -293,10 +295,8 @@ void QtWidgetsApplication1::loadCrossword()
     {
         k = 0;
         correctAnswers.clear();
-        //for (; k < words.size();)
         while(words[k] != "Expressions:")
         {
-            //if (words[k] == "Expressions:") break;
             int j = words[k++].toInt();
             int i = words[k++].toInt();
             QString t = words[k++];
@@ -314,7 +314,10 @@ void QtWidgetsApplication1::loadCrossword()
             }
             else
             {
-                ui->crosswordTable->item(j, i)->setBackground(brush);
+                if (ui->crosswordTable->item(j, i)->background() != *brush)
+                {
+                    ui->crosswordTable->item(j, i)->setBackground(*brush);
+                }
             }
         }
         k++; // переходим на следующее слово, так как текущее - слово-разметка
@@ -328,7 +331,6 @@ void QtWidgetsApplication1::loadCrossword()
             {
                 if (!correctAnswers[qMakePair(j, i)].isNull()) continue;
                 ui->crosswordTable->item(j, i)->setBackground(Qt::transparent);
-                //if (ui->crosswordTable->item(j, i)->background() != Qt::transparent) continue;
                 ui->crosswordTable->item(j, i)->setFlags(Qt::NoItemFlags);
             }
         }
@@ -359,7 +361,10 @@ void QtWidgetsApplication1::loadCrossword()
             j = words[k++].toInt();
             i = words[k++].toInt();
             cellsSelectedVector.push_back(qMakePair(j, i));
-            ui->crosswordTable->item(j, i)->setBackground(brush);     // оставляем ячейки для кроссворда
+            if (ui->crosswordTable->item(j, i)->background() != *brush)
+            {
+                ui->crosswordTable->item(j, i)->setBackground(*brush);
+            }    // оставляем ячейки для кроссворда
         }
         k++; // переходим на следующее слово, так как текущее - слово-разметка
         if (words[k].toInt() == 0) k++; // если следующее слово не цифра (номер выражения) - пропускаем
@@ -400,11 +405,11 @@ void QtWidgetsApplication1::loadCrossword()
     ui->clearCrosswordButton->show();
     ui->editCrossword->show();
     ui->createNewCrosswordButton->setGeometry(1180, 320, 170, 50);
-    
+    is_start = 0;
     file.close();
 }
 
-
+// вызов главного меню
 void QtWidgetsApplication1::onMenuButton()
 {
     connect(ui->crosswordTable, &QTableWidget::itemClicked, this, &QtWidgetsApplication1::onCheck);
@@ -433,6 +438,7 @@ void QtWidgetsApplication1::onMenuButton()
 }
 
 
+// проверка на правильность введенного слова
 void QtWidgetsApplication1::onCheck()
 {
     int correct_words = 0;
@@ -677,6 +683,7 @@ void QtWidgetsApplication1::onCheck()
     }
 }
 
+// вызов редактора
 void QtWidgetsApplication1::onEditCrossword()
 {
     ui->graphicsView->hide();
@@ -728,6 +735,7 @@ void QtWidgetsApplication1::onEditCrossword()
     }
 }
 
+//вызов создания нового кроссворда
 void QtWidgetsApplication1::onCreateNewCrossword()
 {
     ui->graphicsView->hide();
@@ -770,6 +778,7 @@ void QtWidgetsApplication1::onCellClicked(int row, int column)
     ui->crosswordTable->editItem(ui->crosswordTable->item(row, column));
 }
 
+// заполняем regexAnswer
 void QtWidgetsApplication1::setRegexAnswers()
 {
     QString content = ui->exps->toPlainText();
@@ -806,6 +815,7 @@ void QtWidgetsApplication1::setRegexAnswers()
     }
 }
 
+// завершение создания / редактирования
 void QtWidgetsApplication1::onFinishCreation()
 {
     ui->guide->hide();
@@ -823,7 +833,10 @@ void QtWidgetsApplication1::onFinishCreation()
                 {
                     correctAnswers[qMakePair(j, i)] = ui->crosswordTable->item(j, i)->text();
                     ui->crosswordTable->item(j, i)->setText("");
-                    ui->crosswordTable->item(j, i)->setBackground(*brush);
+                    if (ui->crosswordTable->item(j, i)->background() != *brush)
+                    {
+                        ui->crosswordTable->item(j, i)->setBackground(*brush);
+                    }
                 }
                 else
                 {
@@ -847,7 +860,10 @@ void QtWidgetsApplication1::onFinishCreation()
                 if (contains(cellsSelectedVector, qMakePair(j, i)))
                 {
                     ui->crosswordTable->item(j, i)->setText("");
-                    ui->crosswordTable->item(j, i)->setBackground(*brush);
+                    if (ui->crosswordTable->item(j, i)->background() != *brush)
+                    {
+                        ui->crosswordTable->item(j, i)->setBackground(*brush);
+                    }
                 }
                 else if (ui->crosswordTable->item(j, i)->text().toInt() != 0)
                 {
@@ -877,6 +893,7 @@ void QtWidgetsApplication1::onFinishCreation()
     ui->createNewCrosswordButton->setGeometry(1180, 320, 170, 50);
 }
 
+// очистка кроссворда
 void QtWidgetsApplication1::onClearCrossword()
 {
     for (int i = 0; i < 40; ++i) {
@@ -890,6 +907,7 @@ void QtWidgetsApplication1::onClearCrossword()
     ui->graphicsView->hide();
 }
 
+// вывод сообщения о победе
 void QtWidgetsApplication1::showWinMessage()
 {
     ui->menuButton->show();
@@ -925,6 +943,7 @@ bool QtWidgetsApplication1::contains(std::vector<QPair<int, int>> v, QPair<int, 
     return false;
 }
 
+// заполнение cellsSelectedVector
 void QtWidgetsApplication1::cellsSelected()
 {
     std::vector<QPair<int, int>> cells;

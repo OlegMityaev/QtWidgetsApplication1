@@ -16,7 +16,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <qtextstream.h>
-//#include <vector>
+#include <vector>
 #include <set>
 
 const QString CLASSIC_SAVES_DIR = QDir::currentPath() + "/classic_saves";
@@ -50,6 +50,7 @@ private slots:
     void onRegexMode(int state);
 
 private:
+    bool is_start = 0;
     bool mode = 0; // 0 - классический режим, 1 - regex режим
     bool isValidText(QString& text, QRegularExpression regex); // подходит ли введенное слово под регул€рное выражение 
     bool contains(std::vector<QPair<int, int>> v, QPair<int, int> p); // дл€ того, чтобы определить, есть ли така€ €чейка в векторе (используетс€ дл€ cellsSelectedVector)
