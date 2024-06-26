@@ -234,6 +234,111 @@
      <string>regex mode</string>
     </property>
    </widget>
+   <widget class="QListWidget" name="guide">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>380</y>
+      <width>291</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Следуйте правилам:</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1) Напишите выражения внизу экрана </string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>согласно правилам регулярных</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>выражений. Общий вид: 1 regex 2 regex</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Где вместо regex - ваше выражение</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2) Чтобы обозначить границы кроссворда, </string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>укажите цифры на таблице - соответственно </string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>выражениям.</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3) От этих цифр выделите клеточки,</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>в которые должен быть записан ответ.</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Веделять правильно так:</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>зажав лкм и ctrl ведите вправо или вниз от цифры.</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Чтобы перейти к другой цифре - </string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>отпустите лкм, но удерживайте ctrl.</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Повторите с оставшимися цифрами.</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Когда все выделите, отпустите лкм и ctrl.</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Ваш кроссворд будет выделен синим,</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>цифры не должны быть выделены</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Нажмите save to file или finish creation</string>
+     </property>
+    </item>
+   </widget>
   </widget>
  </widget>
  <resources/>

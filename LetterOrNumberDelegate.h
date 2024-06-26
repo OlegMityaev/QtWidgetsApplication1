@@ -33,12 +33,12 @@ public:
         QLineEdit* lineEdit = static_cast<QLineEdit*>(editor);
         QString value = lineEdit->text();
 
-        // Проверяем, что введено ровно одно буквенное или числовое значение
+        // Проверяем, что введено слово согласно выражению
         if (value.isEmpty()) {
             QTableWidget* table = static_cast<QTableWidget*>(model->parent());
             table->item(index.row(), index.column())->setText("");  // Устанавливаем пустое значение напрямую
         }
-        else if ((value.length() == 1 && value.at(0).isLetter()) || (value.length() >= 0 && value.length() <= 2 && value.toInt() >= 0 && value.toInt() <= 99)) {
+        else if ((value.length() == 1 && value.at(0).isLetter()) || (value.length() >= 0 && value.length() <= 2 && value.toInt() > 0 && value.toInt() <= 99)) {
             model->setData(index, value, Qt::EditRole);
         }
     }

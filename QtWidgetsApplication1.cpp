@@ -8,6 +8,7 @@
 //}
 
 void QtWidgetsApplication1::updateTable() {
+    ui->crosswordTable->setEnabled(true);
     ui->crosswordTable->clear();
     for (int i = 0; i < 40; ++i) {
         for (int j = 0; j < 40; ++j) {
@@ -35,8 +36,9 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget* parent)
     brush = new QBrush(*pixmap);
     ui->setupUi(this);
     ui->graphicsView->hide();
-
-    QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]+|\\d{0,2}"));
+    
+    QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$|^\\d{1,2}$"));
+    //QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]+|\\d{0,2}"));
     delegate = new LetterOrNumberDelegate(regex, this);
     mode = 0;
     ui->crosswordTable->setItemDelegate(delegate);
@@ -45,6 +47,7 @@ QtWidgetsApplication1::QtWidgetsApplication1(QWidget* parent)
     ui->crosswordTable->hide();
     ui->clearCrosswordButton->hide();
     ui->editCrossword->hide();
+    ui->guide->hide();
 
     ui->finishCreationButton->hide();
     ui->menuButton->hide();
@@ -87,15 +90,21 @@ void QtWidgetsApplication1::onClassicMode(int state)
 {
     if (state == Qt::Checked) {
         ui->regexModeBox->setChecked(false);
+        QDir().mkpath(CLASSIC_SAVES_DIR);
+        mode = 0;
+        QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$|^\\d{1,2}$"));
+        delegate = new LetterOrNumberDelegate(regex, this);
+        ui->crosswordTable->setItemDelegate(delegate);
     }
     else {
         ui->regexModeBox->setChecked(true);
+        QDir().mkpath(REGEX_SAVES_DIR);
+        mode = 1;
+        QRegularExpression regex(QStringLiteral(".*"));
+        delegate = new LetterOrNumberDelegate(regex, this);
+        ui->crosswordTable->setItemDelegate(delegate);
     }
-    QDir().mkpath(CLASSIC_SAVES_DIR);
-    mode = 0;
-    QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]+|\\d{0,2}"));
-    delegate = new LetterOrNumberDelegate(regex, this);
-    ui->crosswordTable->setItemDelegate(delegate);
+    
 }
 
 // если выбран режим с регулярными выражениями
@@ -103,15 +112,21 @@ void QtWidgetsApplication1::onRegexMode(int state)
 {
     if (state == Qt::Checked) {
         ui->classicModeBox->setChecked(false);
+        QDir().mkpath(REGEX_SAVES_DIR);
+        mode = 1;
+        QRegularExpression regex(QStringLiteral(".*"));
+        delegate = new LetterOrNumberDelegate(regex, this);
+        ui->crosswordTable->setItemDelegate(delegate);
     }
     else {
         ui->classicModeBox->setChecked(true);
+        QDir().mkpath(CLASSIC_SAVES_DIR);
+        mode = 0;
+        QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$|^\\d{1,2}$"));
+        delegate = new LetterOrNumberDelegate(regex, this);
+        ui->crosswordTable->setItemDelegate(delegate);
     }
-    QDir().mkpath(REGEX_SAVES_DIR);
-    mode = 1;
-    QRegularExpression regex(QStringLiteral(".*"));
-    delegate = new LetterOrNumberDelegate(regex, this);
-    ui->crosswordTable->setItemDelegate(delegate);
+    
 }
 
 // кнопка старт
@@ -130,7 +145,7 @@ void QtWidgetsApplication1::onStartButton()
     ui->createNewCrosswordButton->setGeometry(1180, 320, 170, 50);
     if (mode == 0)
     {
-        QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]+"));
+        QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$"));
         delegate = new LetterOrNumberDelegate(regex, this);
         ui->crosswordTable->setItemDelegate(delegate);
     }
@@ -146,7 +161,6 @@ void QtWidgetsApplication1::onStartButton()
 // действие кнопки сохранения в файл
 void QtWidgetsApplication1::onSaveButton()
 {
-    
     textLabel->clear();
     textLabel->setText(QStringLiteral("Напишите имя сохранения (на английском): "));
     textLabel->setGeometry(1180, 660, 200, 30);
@@ -156,7 +170,7 @@ void QtWidgetsApplication1::onSaveButton()
     name_of_save->setEnabled(true);
     name_of_save->setReadOnly(false);
     // Установить валидатор для QLineEdit
-    QRegExp rx("[a-zA-Z0-9]+"); // Разрешены только английские буквы и цифры
+    QRegExp rx("[a-zA-Z0-9]*"); // Разрешены только английские буквы и цифры
     QRegExpValidator* validator = new QRegExpValidator(rx, this);
     name_of_save->setValidator(validator);
     name_of_save->show();
@@ -174,6 +188,7 @@ void QtWidgetsApplication1::saveToFile()
         fileName = CLASSIC_SAVES_DIR + "/" + name + ".txt";
     }
     else {
+        ui->guide->hide();
         fileName = REGEX_SAVES_DIR + "/" + name + ".txt";
     }
     name_of_save->clear();
@@ -245,6 +260,7 @@ void QtWidgetsApplication1::saveToFile()
 
 void QtWidgetsApplication1::loadCrossword()
 {
+    connect(ui->crosswordTable, &QTableWidget::itemClicked, this, &QtWidgetsApplication1::onCheck);
     QString fileName = "";
     if (mode == 0) {
         fileName = QFileDialog::getOpenFileName(this, QStringLiteral("Загрузите кроссворд"), CLASSIC_SAVES_DIR, QStringLiteral("Файлы: (*.txt)"));
@@ -299,7 +315,6 @@ void QtWidgetsApplication1::loadCrossword()
             else
             {
                 ui->crosswordTable->item(j, i)->setBackground(brush);
-                ui->crosswordTable->item(j, i)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
             }
         }
         k++; // переходим на следующее слово, так как текущее - слово-разметка
@@ -311,11 +326,13 @@ void QtWidgetsApplication1::loadCrossword()
         {
             for (int j = 0; j < 40; ++j)
             {
-                if (ui->crosswordTable->item(j, i)->flags() == (Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable)) continue;
+                if (!correctAnswers[qMakePair(j, i)].isNull()) continue;
+                ui->crosswordTable->item(j, i)->setBackground(Qt::transparent);
+                //if (ui->crosswordTable->item(j, i)->background() != Qt::transparent) continue;
                 ui->crosswordTable->item(j, i)->setFlags(Qt::NoItemFlags);
             }
         }
-        QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]+"));
+        QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$"));
         delegate = new LetterOrNumberDelegate(regex, this);
         ui->crosswordTable->setItemDelegate(delegate);
     }
@@ -343,14 +360,12 @@ void QtWidgetsApplication1::loadCrossword()
             i = words[k++].toInt();
             cellsSelectedVector.push_back(qMakePair(j, i));
             ui->crosswordTable->item(j, i)->setBackground(brush);     // оставляем ячейки для кроссворда
-            ui->crosswordTable->item(j, i)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
         }
         k++; // переходим на следующее слово, так как текущее - слово-разметка
         if (words[k].toInt() == 0) k++; // если следующее слово не цифра (номер выражения) - пропускаем
         
         QMap<QPair<int, int>, QRegularExpression>::iterator it_regex;
         
-        //for (; k < words.size(); ++k)
         for (it_regex = regexAnswer.begin(); it_regex != regexAnswer.end();)
         {
             if (words[k].toInt() == 0)
@@ -365,7 +380,7 @@ void QtWidgetsApplication1::loadCrossword()
         {
             for (int j = 0; j < 40; ++j)
             {
-                if (ui->crosswordTable->item(j, i)->flags() == (Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable)) continue;
+                if (contains(cellsSelectedVector, qMakePair(j ,i))) continue;
                 ui->crosswordTable->item(j, i)->setFlags(Qt::NoItemFlags);
             }
         }
@@ -392,6 +407,7 @@ void QtWidgetsApplication1::loadCrossword()
 
 void QtWidgetsApplication1::onMenuButton()
 {
+    connect(ui->crosswordTable, &QTableWidget::itemClicked, this, &QtWidgetsApplication1::onCheck);
     ui->graphicsView->clearMask();
     ui->graphicsView->hide();
     ui->crosswordTable->hide();
@@ -441,6 +457,7 @@ void QtWidgetsApplication1::onCheck()
                         correct_words++;
                         length_correct = 0;
                         length_entered = 0;
+                        if (k >= 40) break;
                         while (!correctAnswers[qMakePair(k, i)].isNull()) {
                             length_correct++;
                             if (ui->crosswordTable->item(k, i)->text() == "") {
@@ -450,9 +467,11 @@ void QtWidgetsApplication1::onCheck()
                                 length_entered++;
                             }
                             k++;
+                            if (k >= 40) break;
                         }
                         if (is_cleared) {
                             for (k = j + 1; k < j + 1 + length_correct; ++k) {
+                                if (k >= 40) break;
                                 if (ui->crosswordTable->item(k, i)->background() != *brush) {
                                     ui->crosswordTable->item(k, i)->setBackground(*brush);
                                 }
@@ -462,6 +481,7 @@ void QtWidgetsApplication1::onCheck()
                             if (length_correct == length_entered) {
                                 entered_words++;
                                 for (k = j + 1; k < j + 1 + length_correct; ++k) {
+                                    if (k >= 40) break;
                                     if (ui->crosswordTable->item(k, i)->backgroundColor() == Qt::green) {
                                         continue;
                                     }
@@ -470,6 +490,7 @@ void QtWidgetsApplication1::onCheck()
                             }
                             else {
                                 for (k = j + 1; k < j + 1 + length_correct; ++k) {
+                                    if (k >= 40) break;
                                     if (ui->crosswordTable->item(k, i)->backgroundColor() == Qt::red) {
                                         continue;
                                     }
@@ -484,6 +505,7 @@ void QtWidgetsApplication1::onCheck()
                         length_correct = 0;
                         length_entered = 0;
                         correct_words++;
+                        if (k >= 40) break;
                         while (!correctAnswers[qMakePair(j, k)].isNull()) {
                             length_correct++;
                             if (ui->crosswordTable->item(j, k)->text() == "") {
@@ -493,9 +515,11 @@ void QtWidgetsApplication1::onCheck()
                                 length_entered++;
                             }
                             k++;
+                            if (k >= 40) break;
                         }
                         if (is_cleared) {
                             for (k = i + 1; k < i + 1 + length_correct; ++k) {
+                                if (k >= 40) break;
                                 ui->crosswordTable->item(j, k)->setBackground(*brush);
                             }
                         }
@@ -503,6 +527,7 @@ void QtWidgetsApplication1::onCheck()
                             if (length_correct == length_entered) {
                                 entered_words++;
                                 for (k = i + 1; k < i + 1 + length_correct; ++k) {
+                                    if (k >= 40) break;
                                     if (ui->crosswordTable->item(j, k)->backgroundColor() == Qt::green) {
                                         continue;
                                     }
@@ -511,6 +536,7 @@ void QtWidgetsApplication1::onCheck()
                             }
                             else {
                                 for (k = i + 1; k < i + 1 + length_correct; ++k) {
+                                    if (k >= 40) break;
                                     if (ui->crosswordTable->item(j, k)->backgroundColor() == Qt::red) {
                                         continue;
                                     }
@@ -545,6 +571,8 @@ void QtWidgetsApplication1::onCheck()
                 num_of_exp++; // номер выражения - выражения записаны по возрастанию -> просто прибавляем 1 каждую итерацию
                 if (ui->crosswordTable->item(j, i)->flags() == (Qt::NoItemFlags))
                 {
+                    if (j + 1 >= 40) break;
+                    if (i + 1 >= 40) break;
                     if (ui->crosswordTable->item(j + 1, i)->flags() != (Qt::NoItemFlags)) {
                         k = j + 1;
                         length_entered = 0;
@@ -560,9 +588,11 @@ void QtWidgetsApplication1::onCheck()
                             }
                             length_correct++;
                             k++;
+                            if (k >= 40) break;
                         }
                         if (is_cleared) {
                             for (k = j + 1; k < j + 1 + length_correct; ++k) {
+                                if (k >= 40) break;
                                 ui->crosswordTable->item(k, i)->setBackground(*brush);
                             }
                         }
@@ -571,6 +601,7 @@ void QtWidgetsApplication1::onCheck()
                             {
                                 entered_words++;
                                 for (k = j + 1; k < j + 1 + length_correct; ++k) {
+                                    if(k >= 40) break;
                                     if (ui->crosswordTable->item(k, i)->backgroundColor() == Qt::green) {
                                         continue;
                                     }
@@ -602,9 +633,11 @@ void QtWidgetsApplication1::onCheck()
                             }
                             length_correct++;
                             k++;
+                            if (k >= 40) break;
                         }
                         if (is_cleared) {
                             for (k = i + 1; k < i + 1 + length_correct; ++k) {
+                                if (k >= 40) break;
                                 ui->crosswordTable->item(j, k)->setBackground(*brush);
                             }
                         }
@@ -613,6 +646,7 @@ void QtWidgetsApplication1::onCheck()
                             {
                                 entered_words++;
                                 for (k = i + 1; k < i + 1 + length_correct; ++k) {
+                                    if (k >= 40) break;
                                     if (ui->crosswordTable->item(j, k)->backgroundColor() == Qt::green) {
                                         continue;
                                     }
@@ -621,6 +655,7 @@ void QtWidgetsApplication1::onCheck()
                             }
                             else {
                                 for (k = i + 1; k < i + 1 + length_correct; ++k) {
+                                    if (k >= 40) break;
                                     if (ui->crosswordTable->item(j, k)->backgroundColor() == Qt::red) {
                                         continue;
                                     }
@@ -644,40 +679,59 @@ void QtWidgetsApplication1::onCheck()
 
 void QtWidgetsApplication1::onEditCrossword()
 {
+    ui->graphicsView->hide();
+    disconnect(ui->crosswordTable, &QTableWidget::itemClicked, this, &QtWidgetsApplication1::onCheck);
     ui->saveButton->show();
     ui->finishCreationButton->show();
     ui->exps->show();
     ui->exps->setEnabled(true);
     ui->crosswordTable->setShowGrid(true);
-    onClearCrossword();
     ui->crosswordTable->setEnabled(true);
-    QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]|\\d{0,2}"));
-    delegate = new LetterOrNumberDelegate(regex, this);
-    ui->crosswordTable->setItemDelegate(delegate);
-    for (int i = 0; i < 40; ++i) {
-        for (int j = 0; j < 40; ++j) {
-            if (!correctAnswers[qMakePair(j, i)].isNull()) {
+
+    if (mode == 0)
+    {
+        QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$|^\\d{1,2}$"));
+        delegate = new LetterOrNumberDelegate(regex, this);
+        ui->crosswordTable->setItemDelegate(delegate);
+        for (int i = 0; i < 40; ++i) 
+        {
+            for (int j = 0; j < 40; ++j) 
+            {
                 ui->crosswordTable->item(j, i)->setText(correctAnswers[qMakePair(j, i)]);
                 ui->crosswordTable->item(j, i)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
                 ui->crosswordTable->item(j, i)->setBackground(Qt::transparent);
             }
         }
     }
-    if (mode == 1)
+    else
     {
+        ui->guide->show();
         // разрешаем вводить только числа
-        regex = QRegularExpression(QStringLiteral("d{0,2}"));
+        QRegularExpression regex(QStringLiteral("d{0,2}"));
         delegate = new LetterOrNumberDelegate(regex, this);
         ui->crosswordTable->setItemDelegate(delegate);
         // Разрешаем выделение нескольких ячеек
         ui->crosswordTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
         ui->crosswordTable->setSelectionBehavior(QAbstractItemView::SelectItems);
-
+        for (int i = 0; i < 40; ++i)
+        {
+            for (int j = 0; j < 40; ++j)
+            {
+                ui->crosswordTable->item(j, i)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+                ui->crosswordTable->item(j, i)->setBackground(Qt::transparent);
+                if (ui->crosswordTable->item(j, i)->text().toInt() == 0)
+                {
+                    ui->crosswordTable->item(j, i)->setText("");
+                }
+            }
+        }
     }
 }
 
 void QtWidgetsApplication1::onCreateNewCrossword()
 {
+    ui->graphicsView->hide();
+    disconnect(ui->crosswordTable, &QTableWidget::itemClicked, this, &QtWidgetsApplication1::onCheck);
     ui->menuButton->show();
     ui->classicModeBox->hide();
     ui->regexModeBox->hide();
@@ -694,11 +748,12 @@ void QtWidgetsApplication1::onCreateNewCrossword()
     correctAnswers.clear();
     updateTable();
     ui->crosswordTable->setEnabled(true);
-    QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]|\\d{0,2}"));
+    QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$|^\\d{1,2}$"));
     delegate = new LetterOrNumberDelegate(regex, this);
     ui->crosswordTable->setItemDelegate(delegate);
     if (mode == 1)
     {
+        ui->guide->show();
         // разрешаем вводить только числа
         regex = QRegularExpression(QStringLiteral("\\d{0,2}"));
         delegate = new LetterOrNumberDelegate(regex, this);
@@ -753,6 +808,8 @@ void QtWidgetsApplication1::setRegexAnswers()
 
 void QtWidgetsApplication1::onFinishCreation()
 {
+    ui->guide->hide();
+    connect(ui->crosswordTable, &QTableWidget::itemClicked, this, &QtWidgetsApplication1::onCheck);
     if (mode == 0)
     {
         for (int i = 0; i < 40; ++i) {
@@ -775,7 +832,7 @@ void QtWidgetsApplication1::onFinishCreation()
                 }
             }
         }
-        QRegularExpression regex(QStringLiteral("[А-Яа-яЁё]"));
+        QRegularExpression regex(QStringLiteral("^[А-Яа-яЁё]?$"));
         delegate = new LetterOrNumberDelegate(regex, this);
         ui->crosswordTable->setItemDelegate(delegate);
     }
@@ -783,12 +840,11 @@ void QtWidgetsApplication1::onFinishCreation()
     {
         setRegexAnswers();
         cellsSelected();
-        std::vector<QPair<int, int>> cells = cellsSelectedVector;
         for (int i = 0; i < 40; ++i)
         {
             for (int j = 0; j < 40; ++j)
             {
-                if (contains(cells, qMakePair(j, i)))
+                if (contains(cellsSelectedVector, qMakePair(j, i)))
                 {
                     ui->crosswordTable->item(j, i)->setText("");
                     ui->crosswordTable->item(j, i)->setBackground(*brush);
